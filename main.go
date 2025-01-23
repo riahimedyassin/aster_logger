@@ -2,6 +2,7 @@
 package logger
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -125,4 +126,16 @@ func getLogger(level string, context ...*gin.Context) *zerolog.Event {
 	}
 	c := context[0]
 	return logger.Str("request-id", getRequestID(c))
+}
+
+// Middleware to track all of the gin request and log them out to the STD.
+func GlobalLoggerMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		status := c.Writer.Status()
+		Debug(c).
+			Str("Method", c.Request.Method).
+			Str("Status", fmt.Sprint(status)).
+			Msg("HTTP request")
+		c.Next()
+	}
 }
