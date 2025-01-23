@@ -11,14 +11,22 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+var request_header = "X-Request-ID"
+
 const (
-	REQUEST_HEADER = "X-Request-ID"
-	colorReset     = "\033[0m"
-	colorRed       = "\033[31m"
-	colorYellow    = "\033[33m"
-	colorBlue      = "\033[34m"
-	colorGreen     = "\033[32m"
+	colorReset  = "\033[0m"
+	colorRed    = "\033[31m"
+	colorYellow = "\033[33m"
+	colorBlue   = "\033[34m"
+	colorGreen  = "\033[32m"
 )
+
+// Used to change the request ID header key.
+// By default the key value is : X-Request-ID.
+// For consistency, it is not recommended to change the key unless necessary.
+func SetRequestIDKey(key string) {
+	request_header = key
+}
 
 // Passing a Gin Context to the logger is for extracting the Request ID from the headers.
 // Request ID headers key : X-Request-ID
@@ -96,7 +104,7 @@ func getColoredDebug(level string) string {
 }
 
 func getRequestID(c *gin.Context) string {
-	return c.Request.Header.Get(REQUEST_HEADER)
+	return c.Request.Header.Get(request_header)
 }
 
 func getLogger(level string, context ...*gin.Context) *zerolog.Event {
@@ -116,5 +124,5 @@ func getLogger(level string, context ...*gin.Context) *zerolog.Event {
 		return logger
 	}
 	c := context[0]
-	return logger.Str("request-id", colorGreen+getRequestID(c)+colorReset)
+	return logger.Str("request-id", getRequestID(c))
 }
